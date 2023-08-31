@@ -1,4 +1,18 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/System/Vector2.hpp>
+
+sf::Vector2f getClosestGridPosition(const sf::Vector2f& position)
+{
+    int xIndex = static_cast<int>((position.x - 1000) / 100);
+    int yIndex = static_cast<int>((position.y - 100) / 100);
+
+    float newX = 1000 + xIndex * 100;
+    float newY = 100 + yIndex * 100;
+
+    return sf::Vector2f(newX, newY);
+}
+
 
 int main()
 {
@@ -343,6 +357,9 @@ int main()
     g1s.setPosition(1605, 805);
     h1s.setPosition(1705, 805);
     
+    bool isPieceSelected = false;
+    sf::Sprite* selectedPiece = nullptr;
+    sf::Vector2f originalPosition;
 
 
 
@@ -354,9 +371,226 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+            {
+                sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                
+                if (!isPieceSelected)
+                {
+                    if (a8s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &a8s;
+                        originalPosition = a8s.getPosition();
+                    }
+                    if (b8s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &b8s;
+                        originalPosition = b8s.getPosition();
+                    }
+                    if (c8s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &c8s;
+                        originalPosition = c8s.getPosition();
+                    }
+                    if (d8s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &d8s;
+                        originalPosition = d8s.getPosition();
+                    }
+                    if (e8s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &e8s;
+                        originalPosition = e8s.getPosition();
+                    }
+                    if (f8s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &f8s;
+                        originalPosition = f8s.getPosition();
+                    }
+                    if (g8s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &g8s;
+                        originalPosition = g8s.getPosition();
+                    }
+                    if (h8s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &h8s;
+                        originalPosition = h8s.getPosition();
+                    }
+                    if (a7s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &a7s;
+                        originalPosition = a7s.getPosition();
+                    }
+                    if (b7s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &b7s;
+                        originalPosition = b7s.getPosition();
+                    }
+                    if (c7s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &c7s;
+                        originalPosition = c7s.getPosition();
+                    }
+                    if (d7s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &d7s;
+                        originalPosition = d7s.getPosition();
+                    }
+                    if (e7s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &e7s;
+                        originalPosition = e7s.getPosition();
+                    }
+                    if (f7s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &f7s;
+                        originalPosition = f7s.getPosition();
+                    }
+                    if (g7s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &g7s;
+                        originalPosition = g7s.getPosition();
+                    }
+                    if (h7s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &h7s;
+                        originalPosition = h7s.getPosition();
+                    }
+                    if (a2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &a2s;
+                        originalPosition = a2s.getPosition();
+                    }
+                    if (b2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &b2s;
+                        originalPosition = b2s.getPosition();
+                    }
+                    if (c2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &c2s;
+                        originalPosition = c2s.getPosition();
+                    }
+                    if (d2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &d2s;
+                        originalPosition = d2s.getPosition();
+                    }
+                    if (e2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &e2s;
+                        originalPosition = e2s.getPosition();
+                    }
+                    if (f2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &f2s;
+                        originalPosition = f2s.getPosition();
+                    }
+                    if (g2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &g2s;
+                        originalPosition = g2s.getPosition();
+                    }
+                    if (h2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &h2s;
+                        originalPosition = h2s.getPosition();
+                    }
+                    if (a1s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &a1s;
+                        originalPosition = a1s.getPosition();
+                    }
+                    if (b1s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &b1s;
+                        originalPosition = b1s.getPosition();
+                    }
+                    if (c1s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &c1s;
+                        originalPosition = c1s.getPosition();
+                    }
+                    if (d1s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &d1s;
+                        originalPosition = d1s.getPosition();
+                    }
+                    if (e1s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &e1s;
+                        originalPosition = e1s.getPosition();
+                    }
+                    if (f1s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &f1s;
+                        originalPosition = f1s.getPosition();
+                    }
+                    if (g1s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &g1s;
+                        originalPosition = g1s.getPosition();
+                    }
+                    if (h2s.getGlobalBounds().contains(mousePosition))
+                    {
+                        isPieceSelected = true;
+                        selectedPiece = &h2s;
+                        originalPosition = h2s.getPosition();
+                    }
+                
+                }
+                else
+                {
+                    sf::Vector2f newPosition = getClosestGridPosition(mousePosition);
+                    selectedPiece->setPosition(newPosition);
+                    isPieceSelected = false;
+                    selectedPiece = nullptr;
+                }
+            }
         }
 
         window.clear();
+
+        if (isPieceSelected && selectedPiece)
+        {
+            sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+            selectedPiece->setPosition(mousePosition.x - selectedPiece->getGlobalBounds().width / 2,
+                                    mousePosition.y - selectedPiece->getGlobalBounds().height / 2);
+            window.draw(*selectedPiece);
+        }
+        
         window.draw(a1);
         window.draw(a2);
         window.draw(a3);
