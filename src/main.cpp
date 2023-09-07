@@ -1,18 +1,43 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <iostream>
+#include <array>
+
+uint8_t board[64] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+uint8_t numericalPos;
+
+int handleCapture(sf::Sprite* targetPiece, const sf::Vector2f& originalPosition, const sf::Vector2f& newPosition, bool isWhite)
+{
+    // Find the position in the board array of the new position
+    numericalPos = ((newPosition.x - 1005) / 100) + ((newPosition.y - 105) / 100 * 8);
+
+    // Check if the new position has an opponent's piece 
+    if (((board[numericalPos] < 16 && isWhite) || ((board[numericalPos] > 15 && board[numericalPos] < 32) && !isWhite)) || board[numericalPos] == 255)
+    {
+        // Check if move is leal
+        uint8_t numericalStartPos = ((originalPosition.x - 1005) / 100) + ((originalPosition.y - 105) / 100 * 8);
+        
+
+
+        // Tell which piece to remove
+        return board[numericalPos];
+    }
+    
+    // No capture happened
+    return -1;
+}
 
 sf::Vector2f getClosestGridPosition(const sf::Vector2f& position)
 {
     int xIndex = static_cast<int>((position.x - 1000) / 100);
     int yIndex = static_cast<int>((position.y - 100) / 100);
 
-    float newX = 1000 + xIndex * 100;
-    float newY = 100 + yIndex * 100;
+    float newX = 1005 + xIndex * 100;
+    float newY = 105 + yIndex * 100;
 
     return sf::Vector2f(newX, newY);
 }
-
 
 int main()
 {
@@ -274,7 +299,7 @@ int main()
     h1.setFillColor(sf::Color(255, 206, 158));
     h1.setPosition(1700,800);
 
-    sf::Texture B, b, K, k, N, n, P, p, Q, q, R, r;
+        sf::Texture B, b, K, k, N, n, P, p, Q, q, R, r;
 
     B.loadFromFile("../assets/pieces/B.png");
     b.loadFromFile("../assets/pieces/b.png");
@@ -356,6 +381,9 @@ int main()
     f1s.setPosition(1505, 805);
     g1s.setPosition(1605, 805);
     h1s.setPosition(1705, 805);
+
+    sf::Sprite* blackPieces[16] = {&a8s, &b8s, &c8s, &d8s, &e8s, &f8s, &g8s, &h8s, &a7s, &b7s, &c7s, &d7s, &e7s, &f7s, &g7s, &h7s};
+    sf::Sprite* whitePieces[16] = {&a2s, &b2s, &c2s, &d2s, &e2s, &f2s, &g2s, &h2s, &a1s, &b1s, &c1s, &d1s, &e1s, &f1s, &g1s, &h1s};
     
     bool isPieceSelected = false;
     sf::Sprite* selectedPiece = nullptr;
@@ -563,20 +591,165 @@ int main()
                         selectedPiece = &g1s;
                         originalPosition = g1s.getPosition();
                     }
-                    if (h2s.getGlobalBounds().contains(mousePosition))
+                    if (h1s.getGlobalBounds().contains(mousePosition))
                     {
                         isPieceSelected = true;
-                        selectedPiece = &h2s;
-                        originalPosition = h2s.getPosition();
+                        selectedPiece = &h1s;
+                        originalPosition = h1s.getPosition();
                     }
+                    numericalPos = ((originalPosition.x - 1005) / 100) + ((originalPosition.y - 105) / 100 * 8);
+                    board[numericalPos] = 255;
                 
                 }
                 else
                 {
                     sf::Vector2f newPosition = getClosestGridPosition(mousePosition);
-                    selectedPiece->setPosition(newPosition);
-                    isPieceSelected = false;
-                    selectedPiece = nullptr;
+                    int moveWhom = -1;
+                    
+                    moveWhom = handleCapture(selectedPiece, originalPosition, newPosition, (std::find(std::begin(blackPieces), std::end(blackPieces), selectedPiece)) == std::end(blackPieces)); // Call a function to handle capturing
+                        if (moveWhom >= 0) {
+
+                        numericalPos = ((newPosition.x - 1005) / 100) + ((newPosition.y - 105) / 100 * 8);
+                        if (selectedPiece == &a8s) board[numericalPos] = 0;
+                        if (selectedPiece == &b8s) board[numericalPos] = 1;
+                        if (selectedPiece == &c8s) board[numericalPos] = 2;
+                        if (selectedPiece == &d8s) board[numericalPos] = 3;
+                        if (selectedPiece == &e8s) board[numericalPos] = 4;
+                        if (selectedPiece == &f8s) board[numericalPos] = 5;
+                        if (selectedPiece == &g8s) board[numericalPos] = 6;
+                        if (selectedPiece == &h8s) board[numericalPos] = 7;
+                        if (selectedPiece == &a7s) board[numericalPos] = 8;
+                        if (selectedPiece == &b7s) board[numericalPos] = 9;
+                        if (selectedPiece == &c7s) board[numericalPos] = 10;
+                        if (selectedPiece == &d7s) board[numericalPos] = 11;
+                        if (selectedPiece == &e7s) board[numericalPos] = 12;
+                        if (selectedPiece == &f7s) board[numericalPos] = 13;
+                        if (selectedPiece == &g7s) board[numericalPos] = 14;
+                        if (selectedPiece == &h7s) board[numericalPos] = 15;
+                        if (selectedPiece == &a2s) board[numericalPos] = 16;
+                        if (selectedPiece == &b2s) board[numericalPos] = 17;
+                        if (selectedPiece == &c2s) board[numericalPos] = 18;
+                        if (selectedPiece == &d2s) board[numericalPos] = 19;
+                        if (selectedPiece == &e2s) board[numericalPos] = 20;
+                        if (selectedPiece == &f2s) board[numericalPos] = 21;
+                        if (selectedPiece == &g2s) board[numericalPos] = 22;
+                        if (selectedPiece == &h2s) board[numericalPos] = 23;
+                        if (selectedPiece == &a1s) board[numericalPos] = 24;
+                        if (selectedPiece == &b1s) board[numericalPos] = 25;
+                        if (selectedPiece == &c1s) board[numericalPos] = 26;
+                        if (selectedPiece == &d1s) board[numericalPos] = 27;
+                        if (selectedPiece == &e1s) board[numericalPos] = 28;
+                        if (selectedPiece == &f1s) board[numericalPos] = 29;
+                        if (selectedPiece == &g1s) board[numericalPos] = 30;
+                        if (selectedPiece == &h1s) board[numericalPos] = 31;
+
+                        switch(moveWhom) {
+                            case 0:
+                                a8s.setPosition(-100, -100);
+                                break;
+                            case 1:
+                                b8s.setPosition(-100, -100);
+                                break;
+                            case 2:
+                                c8s.setPosition(-100, -100);
+                                break;
+                            case 3:
+                                d8s.setPosition(-100, -100);
+                                break;
+                            case 4:
+                                e8s.setPosition(-100, -100);
+                                break;
+                            case 5:
+                                f8s.setPosition(-100, -100);
+                                break;
+                            case 6:
+                                g8s.setPosition(-100, -100);
+                                break;
+                            case 7:
+                                h8s.setPosition(-100, -100);
+                                break;
+                            case 8:
+                                a7s.setPosition(-100, -100);
+                                break;
+                            case 9:
+                                b7s.setPosition(-100, -100);
+                                break;
+                            case 10:
+                                c7s.setPosition(-100, -100);
+                                break;
+                            case 11:
+                                d7s.setPosition(-100, -100);
+                                break;
+                            case 12:
+                                e7s.setPosition(-100, -100);
+                                break;
+                            case 13:
+                                f7s.setPosition(-100, -100);
+                                break;
+                            case 14:
+                                g7s.setPosition(-100, -100);
+                                break;
+                            case 15:
+                                h7s.setPosition(-100, -100);
+                                break;
+                            case 16:
+                                a2s.setPosition(-100, -100);
+                                break;
+                            case 17:
+                                b2s.setPosition(-100, -100);
+                                break;
+                            case 18:
+                                c2s.setPosition(-100, -100);
+                                break;
+                            case 19:
+                                d2s.setPosition(-100, -100);
+                                break;
+                            case 20:
+                                e2s.setPosition(-100, -100);
+                                break;
+                            case 21:
+                                f2s.setPosition(-100, -100);
+                                break;
+                            case 22:
+                                g2s.setPosition(-100, -100);
+                                break;
+                            case 23:
+                                h2s.setPosition(-100, -100);
+                                break;
+                            case 24:
+                                a1s.setPosition(-100, -100);
+                                break;
+                            case 25:
+                                b1s.setPosition(-100, -100);
+                                break;
+                            case 26:
+                                c1s.setPosition(-100, -100);
+                                break;
+                            case 27:
+                               d1s.setPosition(-100, -100);
+                                break;
+                            case 28:
+                                e1s.setPosition(-100, -100);
+                                break;
+                            case 29:
+                                f1s.setPosition(-100, -100);
+                                break;
+                            case 30:
+                                g1s.setPosition(-100, -100);
+                                 break;
+                            case 31:
+                                h1s.setPosition(-100, -100);
+                                 break;
+                            case 255:
+                                break;
+                        }
+                        
+
+                        selectedPiece->setPosition(newPosition);
+                        isPieceSelected = false;
+                        selectedPiece = nullptr;
+                        
+                    }
                 }
             }
         }
@@ -586,8 +759,8 @@ int main()
         if (isPieceSelected && selectedPiece)
         {
             sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-            selectedPiece->setPosition(mousePosition.x - selectedPiece->getGlobalBounds().width / 2,
-                                    mousePosition.y - selectedPiece->getGlobalBounds().height / 2);
+            selectedPiece->setPosition(mousePosition.x - 45,
+                                    mousePosition.y - 45);
             window.draw(*selectedPiece);
         }
         
