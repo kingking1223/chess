@@ -13,6 +13,96 @@ uint8_t LeftEdgeCells[8] = {0, 8, 16, 24, 32, 40, 48, 56};
 uint8_t RightEdgeCells[8] = {7, 15, 23, 31, 39, 47, 55, 63};
 int8_t KingLegalMoves[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
 
+bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite) {
+    // Assuming white pawns move from bottom (rank 2) to top (rank 7),
+    // and black pawns move from top (rank 7) to bottom (rank 2).
+    if (originalPosition == newPosition) return false;
+    int startRank = std::floor(originalPosition / 8); 
+    int endRank = std::floor(newPosition / 8);  
+    int startFile = originalPosition % 8; 
+    int endFile = newPosition % 8; 
+
+    int rankDiff = endRank - startRank; 
+    int fileDiff = abs(endFile - startFile); 
+
+    if (isWhite) {
+        // White pawns can move one square forward (rank + 1).
+        if (rankDiff == -1 && fileDiff == 0) {
+            return true;
+        }
+        // White pawns can move two squares forward from the initial position (rank + 2).
+        if (startRank == 6 && rankDiff == -2 && fileDiff == 0) {
+            return true;
+        }
+    } else { // Black
+        // Black pawns can move one square forward (rank - 1).
+        if (rankDiff == 1 && fileDiff == 0) {
+            return true;
+        }
+        // Black pawns can move two squares forward from the initial position (rank - 2).
+        if (startRank == 1 && rankDiff == 2 && fileDiff == 0) {
+            return true;
+        }
+    }
+
+    // Pawns cannot move sideways or capture forward.
+    return false;
+}
+
+bool isRookMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
+    if (originalPosition == newPosition) return false;
+    int startRank = originalPosition / 8;
+    int endRank = newPosition / 8;
+    int startFile = originalPosition % 8;
+    int endFile = newPosition % 8;
+
+    // Rooks can move horizontally or vertically.
+    return (startRank == endRank) || (startFile == endFile);
+}
+
+bool isKnightMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
+    if (originalPosition == newPosition) return false;
+    int startRank = std::floor(originalPosition / 8);
+    int endRank = std::floor(newPosition / 8);
+    int startFile = originalPosition % 8;
+    int endFile = newPosition % 8;
+
+    int rankDiff = std::abs(endRank - startRank);
+    int fileDiff = std::abs(endFile - startFile);
+
+    // Knights move in an L-shape: 2 squares in one direction and 1 square in the other.
+    return (rankDiff == 2 && fileDiff == 1) || (rankDiff == 1 && fileDiff == 2);
+}
+
+bool isBishopMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
+    if (originalPosition == newPosition) return false;
+    int startRank = std::floor(originalPosition / 8);
+    int endRank = std::floor(newPosition / 8);
+    int startFile = originalPosition % 8;
+    int endFile = newPosition % 8;
+
+    // Bishops can move diagonally.
+    return std::abs(endRank - startRank) == std::abs(endFile - startFile);
+}
+
+bool isQueenMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
+    return (isRookMoveLegal(originalPosition, newPosition) || isBishopMoveLegal(originalPosition, newPosition));
+}
+
+bool isKingMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
+    if (originalPosition == newPosition) return false;
+    int startRank = std::floor(originalPosition / 8); // 2 
+    int endRank = std::floor(newPosition / 8); // 4
+    int startFile = originalPosition % 8; // 4
+    int endFile = newPosition % 8; // 4
+
+    int rankDiff = std::abs(endRank - startRank);  // 2
+    int fileDiff = std::abs(endFile - startFile);  // 0
+
+    // Kings can move one square in any direction.
+    return (rankDiff <= 1 && fileDiff <= 1);
+}
+
 int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::Vector2f& originalPosition, const sf::Vector2f& newPosition, bool isWhite)
 {
     // Find the position in the board array of the new position
@@ -26,11 +116,12 @@ int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::V
         int8_t numericalNetMovement = numericalPos - numericalStartPos;
         
         // Determine whether the move is legal
-        if (((numericalPieceId == 2) && (numericalNetMovement != 0) && ((numericalNetMovement % 8 == 0) || (numericalNetMovement >= (numericalStartPos % 8) * -1 && numericalNetMovement <= 0) || (numericalNetMovement <= 7 - numericalStartPos % 8 && numericalNetMovement >= 0))) ||
-        ((numericalPieceId == 3) && (std::find(std::begin(KnightLegalMoves), std::end(KnightLegalMoves), numericalNetMovement) != std::end(KnightLegalMoves))) || 
-        ((numericalPieceId == 4) && ((numericalNetMovement % 7 == 0 && (std::find(std::begin(VerticalEdgePieces), std::end(VerticalEdgePieces), numericalPos + 1) == std::end(VerticalEdgePieces))) || (numericalNetMovement % 9 == 0 && (std::find(std::begin(VerticalEdgePieces), std::end(VerticalEdgePieces), numericalPos - 1) == std::end(VerticalEdgePieces))))) ||
-        ((numericalPieceId == 5) && (((numericalNetMovement != 0) && ((numericalNetMovement % 8 == 0) || (numericalNetMovement >= (numericalStartPos % 8) * -1 && numericalNetMovement <= 0) || (numericalNetMovement <= 7 - numericalStartPos % 8 && numericalNetMovement >= 0))) || ((numericalNetMovement % 7 == 0 && (std::find(std::begin(VerticalEdgePieces), std::end(VerticalEdgePieces), numericalPos + 1) == std::end(VerticalEdgePieces))) || (numericalNetMovement % 9 == 0 && (std::find(std::begin(VerticalEdgePieces), std::end(VerticalEdgePieces), numericalPos - 1) == std::end(VerticalEdgePieces)))))) ||
-        ((numericalPieceId == 6) && ((numericalNetMovement == -9 && (std::find(std::begin(RightEdgeCells), std::end(RightEdgeCells), numericalPos) == std::end(RightEdgeCells))) || (numericalNetMovement == -8) || (numericalNetMovement == -7 && (std::find(std::begin(LeftEdgeCells), std::end(LeftEdgeCells), numericalPos) == std::end(LeftEdgeCells))) || (numericalNetMovement == -1 && (std::find(std::begin(LeftEdgeCells), std::end(LeftEdgeCells), numericalStartPos) == std::end(LeftEdgeCells))) || (numericalNetMovement == 1 && (std::find(std::begin(RightEdgeCells), std::end(RightEdgeCells), numericalStartPos) == std::end(RightEdgeCells))) || (numericalNetMovement == 7 && (std::find(std::begin(LeftEdgeCells), std::end(LeftEdgeCells), numericalStartPos) == std::end(LeftEdgeCells))) || (numericalNetMovement == 8) || (numericalNetMovement == 9 && (std::find(std::begin(RightEdgeCells), std::end(RightEdgeCells), numericalStartPos) == std::end(RightEdgeCells)))))) {
+        if ((numericalPieceId == 1 && isPawnMoveLegal(numericalStartPos, numericalPos, isWhite)) ||
+        (numericalPieceId == 2 && isRookMoveLegal(numericalStartPos, numericalPos)) ||
+        (numericalPieceId == 3 && isKnightMoveLegal(numericalStartPos, numericalPos)) ||
+        (numericalPieceId == 4 && isBishopMoveLegal(numericalStartPos, numericalPos)) ||
+        (numericalPieceId == 5 && isQueenMoveLegal(numericalStartPos, numericalPos)) ||
+        (numericalPieceId == 6 && isKingMoveLegal(numericalStartPos, numericalPos))) {
             // Tell which piece to remove
             return board[numericalPos];
         }
@@ -624,8 +715,8 @@ int main()
                     if ((selectedPiece == &a8s) || (selectedPiece == &h8s) || (selectedPiece == &a1s) || (selectedPiece == &h1s)) numericalPieceId = 2;
                     if ((selectedPiece == &b8s) || (selectedPiece == &g8s) || (selectedPiece == &b1s) || (selectedPiece == &g1s)) numericalPieceId = 3;
                     if ((selectedPiece == &c8s) || (selectedPiece == &f8s) || (selectedPiece == &c1s) || (selectedPiece == &f1s)) numericalPieceId = 4;
-                    if ((selectedPiece == &e8s) || (selectedPiece == &e1s)) numericalPieceId = 5;
-                    if ((selectedPiece == &d8s) || (selectedPiece == &d1s)) numericalPieceId = 6;
+                    if ((selectedPiece == &d8s) || (selectedPiece == &d1s)) numericalPieceId = 5;
+                    if ((selectedPiece == &e8s) || (selectedPiece == &e1s)) numericalPieceId = 6;
                     if (std::find(std::begin(pawnList), std::end(pawnList), selectedPiece) != std::end(pawnList)) numericalPieceId = 1;
                     
                     
