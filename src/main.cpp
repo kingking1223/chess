@@ -13,6 +13,7 @@ uint8_t VerticalEdgePieces[16] = {0, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 4
 uint8_t LeftEdgeCells[8] = {0, 8, 16, 24, 32, 40, 48, 56};
 uint8_t RightEdgeCells[8] = {7, 15, 23, 31, 39, 47, 55, 63};
 int8_t KingLegalMoves[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
+bool isWhitesTurnToMove = true;
 
 bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite) {
     // Assuming white pawns move from bottom (rank 2) to top (rank 7),
@@ -35,6 +36,9 @@ bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite
         if (startRank == 6 && rankDiff == -2 && fileDiff == 0) {
             return true;
         }
+        if (board[newPosition] <= 15 && rankDiff == -1 && std::abs(fileDiff) == 1) {
+            return true;
+        }
     } else { // Black
         // Black pawns can move one square forward (rank - 1).
         if (rankDiff == 1 && fileDiff == 0) {
@@ -42,6 +46,9 @@ bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite
         }
         // Black pawns can move two squares forward from the initial position (rank - 2).
         if (startRank == 1 && rankDiff == 2 && fileDiff == 0) {
+            return true;
+        }
+        if (board[newPosition] >= 16 && board[newPosition] <= 31 && rankDiff == -1 && std::abs(fileDiff) == 1) {
             return true;
         }
     }
@@ -547,193 +554,193 @@ int main()
                 
                 if (!isPieceSelected)
                 {
-                    if (a8s.getGlobalBounds().contains(mousePosition))
+                    if (a8s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &a8s;
                         originalPosition = a8s.getPosition();
                     }
-                    if (b8s.getGlobalBounds().contains(mousePosition))
+                    if (b8s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &b8s;
                         originalPosition = b8s.getPosition();
                     }
-                    if (c8s.getGlobalBounds().contains(mousePosition))
+                    if (c8s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &c8s;
                         originalPosition = c8s.getPosition();
                     }
-                    if (d8s.getGlobalBounds().contains(mousePosition))
+                    if (d8s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &d8s;
                         originalPosition = d8s.getPosition();
                     }
-                    if (e8s.getGlobalBounds().contains(mousePosition))
+                    if (e8s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &e8s;
                         originalPosition = e8s.getPosition();
                     }
-                    if (f8s.getGlobalBounds().contains(mousePosition))
+                    if (f8s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &f8s;
                         originalPosition = f8s.getPosition();
                     }
-                    if (g8s.getGlobalBounds().contains(mousePosition))
+                    if (g8s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &g8s;
                         originalPosition = g8s.getPosition();
                     }
-                    if (h8s.getGlobalBounds().contains(mousePosition))
+                    if (h8s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &h8s;
                         originalPosition = h8s.getPosition();
                     }
-                    if (a7s.getGlobalBounds().contains(mousePosition))
+                    if (a7s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &a7s;
                         originalPosition = a7s.getPosition();
                     }
-                    if (b7s.getGlobalBounds().contains(mousePosition))
+                    if (b7s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &b7s;
                         originalPosition = b7s.getPosition();
                     }
-                    if (c7s.getGlobalBounds().contains(mousePosition))
+                    if (c7s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &c7s;
                         originalPosition = c7s.getPosition();
                     }
-                    if (d7s.getGlobalBounds().contains(mousePosition))
+                    if (d7s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &d7s;
                         originalPosition = d7s.getPosition();
                     }
-                    if (e7s.getGlobalBounds().contains(mousePosition))
+                    if (e7s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &e7s;
                         originalPosition = e7s.getPosition();
                     }
-                    if (f7s.getGlobalBounds().contains(mousePosition))
+                    if (f7s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &f7s;
                         originalPosition = f7s.getPosition();
                     }
-                    if (g7s.getGlobalBounds().contains(mousePosition))
+                    if (g7s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &g7s;
                         originalPosition = g7s.getPosition();
                     }
-                    if (h7s.getGlobalBounds().contains(mousePosition))
+                    if (h7s.getGlobalBounds().contains(mousePosition) && !isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &h7s;
                         originalPosition = h7s.getPosition();
                     }
-                    if (a2s.getGlobalBounds().contains(mousePosition))
+                    if (a2s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &a2s;
                         originalPosition = a2s.getPosition();
                     }
-                    if (b2s.getGlobalBounds().contains(mousePosition))
+                    if (b2s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &b2s;
                         originalPosition = b2s.getPosition();
                     }
-                    if (c2s.getGlobalBounds().contains(mousePosition))
+                    if (c2s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &c2s;
                         originalPosition = c2s.getPosition();
                     }
-                    if (d2s.getGlobalBounds().contains(mousePosition))
+                    if (d2s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &d2s;
                         originalPosition = d2s.getPosition();
                     }
-                    if (e2s.getGlobalBounds().contains(mousePosition))
+                    if (e2s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &e2s;
                         originalPosition = e2s.getPosition();
                     }
-                    if (f2s.getGlobalBounds().contains(mousePosition))
+                    if (f2s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &f2s;
                         originalPosition = f2s.getPosition();
                     }
-                    if (g2s.getGlobalBounds().contains(mousePosition))
+                    if (g2s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &g2s;
                         originalPosition = g2s.getPosition();
                     }
-                    if (h2s.getGlobalBounds().contains(mousePosition))
+                    if (h2s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &h2s;
                         originalPosition = h2s.getPosition();
                     }
-                    if (a1s.getGlobalBounds().contains(mousePosition))
+                    if (a1s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &a1s;
                         originalPosition = a1s.getPosition();
                     }
-                    if (b1s.getGlobalBounds().contains(mousePosition))
+                    if (b1s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &b1s;
                         originalPosition = b1s.getPosition();
                     }
-                    if (c1s.getGlobalBounds().contains(mousePosition))
+                    if (c1s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &c1s;
                         originalPosition = c1s.getPosition();
                     }
-                    if (d1s.getGlobalBounds().contains(mousePosition))
+                    if (d1s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &d1s;
                         originalPosition = d1s.getPosition();
                     }
-                    if (e1s.getGlobalBounds().contains(mousePosition))
+                    if (e1s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &e1s;
                         originalPosition = e1s.getPosition();
                     }
-                    if (f1s.getGlobalBounds().contains(mousePosition))
+                    if (f1s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &f1s;
                         originalPosition = f1s.getPosition();
                     }
-                    if (g1s.getGlobalBounds().contains(mousePosition))
+                    if (g1s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &g1s;
                         originalPosition = g1s.getPosition();
                     }
-                    if (h1s.getGlobalBounds().contains(mousePosition))
+                    if (h1s.getGlobalBounds().contains(mousePosition) && isWhitesTurnToMove)
                     {
                         isPieceSelected = true;
                         selectedPiece = &h1s;
@@ -903,6 +910,7 @@ int main()
                         selectedPiece->setPosition(newPosition);
                         isPieceSelected = false;
                         selectedPiece = nullptr;
+                        isWhitesTurnToMove = !isWhitesTurnToMove;
                         
                     }
                 }
