@@ -4,6 +4,7 @@
 #include <iostream>
 #include <array>
 #include <cmath>
+#include <algorithm>
 
 uint8_t board[64] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 uint8_t numericalPos;
@@ -91,16 +92,49 @@ bool isQueenMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
 
 bool isKingMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
     if (originalPosition == newPosition) return false;
-    int startRank = std::floor(originalPosition / 8); // 2 
-    int endRank = std::floor(newPosition / 8); // 4
-    int startFile = originalPosition % 8; // 4
-    int endFile = newPosition % 8; // 4
+    int startRank = std::floor(originalPosition / 8); 
+    int endRank = std::floor(newPosition / 8); 
+    int startFile = originalPosition % 8; 
+    int endFile = newPosition % 8; 
 
-    int rankDiff = std::abs(endRank - startRank);  // 2
-    int fileDiff = std::abs(endFile - startFile);  // 0
+    int rankDiff = std::abs(endRank - startRank);  
+    int fileDiff = std::abs(endFile - startFile);
 
     // Kings can move one square in any direction.
     return (rankDiff <= 1 && fileDiff <= 1);
+}
+
+bool isMovingPathBlocked(uint8_t originalPosition, uint8_t newPosition) {
+    int startRank = std::floor(originalPosition / 8);
+    int endRank = std::floor(newPosition / 8);
+    int startFile = originalPosition % 8;
+    int endFile = newPosition % 8;
+
+    int rankDiff = std::abs(endRank - startRank);
+    int fileDiff = std::abs(endFile - startFile);
+
+    // fileDiff == 0 implies a verical move
+    if (fileDiff == 0) {
+        for (int i = std::max(originalPosition, newPosition); i > std::min(originalPosition, newPosition); i-=8) {
+            if (board[i] != 255) return true;
+        }
+    } else if (rankDiff == 0) { // rankDiff == 0 implies a horizontal move
+        for (int i = std::max(originalPosition, newPosition); i > std::min(originalPosition, newPosition); i-=1) {
+            if (board[i] != 255) return true;
+        }
+    } else if (fileDiff * rankDiff != 0) {
+        if (std::abs(originalPosition - newPosition) % 7 == 0) {
+            for (int i = std::max(originalPosition, newPosition); i > std::min(originalPosition, newPosition); i-= 7) {
+                if (board[i] != 255) return true;
+            }
+        } else {
+            for (int i = std::max(originalPosition, newPosition); i > std::min(originalPosition, newPosition); i-= 9) {
+                if (board[i] != 255) return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::Vector2f& originalPosition, const sf::Vector2f& newPosition, bool isWhite)
@@ -122,6 +156,9 @@ int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::V
         (numericalPieceId == 4 && isBishopMoveLegal(numericalStartPos, numericalPos)) ||
         (numericalPieceId == 5 && isQueenMoveLegal(numericalStartPos, numericalPos)) ||
         (numericalPieceId == 6 && isKingMoveLegal(numericalStartPos, numericalPos))) {
+            if (numericalPieceId != 2) {
+                if (isMovingPathBlocked(numericalStartPos, numericalPos)) return -1;
+            }
             // Tell which piece to remove
             return board[numericalPos];
         }
