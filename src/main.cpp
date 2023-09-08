@@ -15,6 +15,7 @@ uint8_t RightEdgeCells[8] = {7, 15, 23, 31, 39, 47, 55, 63};
 int8_t KingLegalMoves[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
 sf::Sprite* promotedPawns[16] = {};
 bool isWhitesTurnToMove = true;
+uint8_t CastleState = 136;
 
 bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite) {
     // Assuming white pawns move from bottom (rank 2) to top (rank 7),
@@ -40,6 +41,9 @@ bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite
         if (board[newPosition] <= 15 && rankDiff == -1 && std::abs(fileDiff) == 1) {
             return true;
         }
+        if (startRank == 3 && endRank == 2 && board[newPosition] == 255 && ((endFile-startFile == -1 && board[originalPosition-1] >= 8 && board[originalPosition-1] <= 15) || (endFile-startFile == 1 && board[originalPosition+1] >=8 && board[originalPosition+1] <=15))) {
+            return true;
+        }
     } else { // Black
         // Black pawns can move one square forward (rank - 1).
         if (rankDiff == 1 && fileDiff == 0) {
@@ -50,6 +54,9 @@ bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite
             return true;
         }
         if (board[newPosition] >= 16 && board[newPosition] <= 31 && rankDiff == 1 && std::abs(fileDiff) == 1) {
+            return true;
+        }
+        if (startRank == 4 && endRank == 5 && board[newPosition] == 255 && ((endFile-startFile == -1 && board[originalPosition-1] >=16 && board[originalPosition-1] <=23) || (endFile-startFile == 1 && board[originalPosition+1] >= 16 && board[originalPosition+1] <=23))) {
             return true;
         }
     }
@@ -176,6 +183,9 @@ int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::V
             if (numericalPieceId == 1) {
                 if ((newPosition.y == 105 && isWhite) || (newPosition.y == 805 && !isWhite)) {
                     return board[numericalPos] + 32;
+                }
+                if (numericalNetMovement != -8 && numericalNetMovement != -16 && numericalNetMovement != 8 && numericalNetMovement != 16) {
+                    return board[numericalPos + 8];
                 }
             }
             return board[numericalPos];
