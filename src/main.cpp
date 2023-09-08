@@ -3,11 +3,17 @@
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <array>
+#include <cmath>
 
 uint8_t board[64] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 uint8_t numericalPos;
+int8_t KnightLegalMoves[8] = {-17, -15, -6, 10, 17, 15, 6, -10};
+uint8_t VerticalEdgePieces[16] = {0, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 48, 55, 56, 63};
+uint8_t LeftEdgeCells[8] = {0, 8, 16, 24, 32, 40, 48, 56};
+uint8_t RightEdgeCells[8] = {7, 15, 23, 31, 39, 47, 55, 63};
+int8_t KingLegalMoves[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
 
-int handleCapture(sf::Sprite* targetPiece, const sf::Vector2f& originalPosition, const sf::Vector2f& newPosition, bool isWhite)
+int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::Vector2f& originalPosition, const sf::Vector2f& newPosition, bool isWhite)
 {
     // Find the position in the board array of the new position
     numericalPos = ((newPosition.x - 1005) / 100) + ((newPosition.y - 105) / 100 * 8);
@@ -15,13 +21,19 @@ int handleCapture(sf::Sprite* targetPiece, const sf::Vector2f& originalPosition,
     // Check if the new position has an opponent's piece 
     if (((board[numericalPos] < 16 && isWhite) || ((board[numericalPos] > 15 && board[numericalPos] < 32) && !isWhite)) || board[numericalPos] == 255)
     {
-        // Check if move is leal
+        // Check if move is legal
         uint8_t numericalStartPos = ((originalPosition.x - 1005) / 100) + ((originalPosition.y - 105) / 100 * 8);
+        int8_t numericalNetMovement = numericalPos - numericalStartPos;
         
-
-
-        // Tell which piece to remove
-        return board[numericalPos];
+        // Determine whether the move is legal
+        if (((numericalPieceId == 2) && (numericalNetMovement != 0) && ((numericalNetMovement % 8 == 0) || (numericalNetMovement >= (numericalStartPos % 8) * -1 && numericalNetMovement <= 0) || (numericalNetMovement <= 7 - numericalStartPos % 8 && numericalNetMovement >= 0))) ||
+        ((numericalPieceId == 3) && (std::find(std::begin(KnightLegalMoves), std::end(KnightLegalMoves), numericalNetMovement) != std::end(KnightLegalMoves))) || 
+        ((numericalPieceId == 4) && ((numericalNetMovement % 7 == 0 && (std::find(std::begin(VerticalEdgePieces), std::end(VerticalEdgePieces), numericalPos + 1) == std::end(VerticalEdgePieces))) || (numericalNetMovement % 9 == 0 && (std::find(std::begin(VerticalEdgePieces), std::end(VerticalEdgePieces), numericalPos - 1) == std::end(VerticalEdgePieces))))) ||
+        ((numericalPieceId == 5) && (((numericalNetMovement != 0) && ((numericalNetMovement % 8 == 0) || (numericalNetMovement >= (numericalStartPos % 8) * -1 && numericalNetMovement <= 0) || (numericalNetMovement <= 7 - numericalStartPos % 8 && numericalNetMovement >= 0))) || ((numericalNetMovement % 7 == 0 && (std::find(std::begin(VerticalEdgePieces), std::end(VerticalEdgePieces), numericalPos + 1) == std::end(VerticalEdgePieces))) || (numericalNetMovement % 9 == 0 && (std::find(std::begin(VerticalEdgePieces), std::end(VerticalEdgePieces), numericalPos - 1) == std::end(VerticalEdgePieces)))))) ||
+        ((numericalPieceId == 6) && ((numericalNetMovement == -9 && (std::find(std::begin(RightEdgeCells), std::end(RightEdgeCells), numericalPos) == std::end(RightEdgeCells))) || (numericalNetMovement == -8) || (numericalNetMovement == -7 && (std::find(std::begin(LeftEdgeCells), std::end(LeftEdgeCells), numericalPos) == std::end(LeftEdgeCells))) || (numericalNetMovement == -1 && (std::find(std::begin(LeftEdgeCells), std::end(LeftEdgeCells), numericalStartPos) == std::end(LeftEdgeCells))) || (numericalNetMovement == 1 && (std::find(std::begin(RightEdgeCells), std::end(RightEdgeCells), numericalStartPos) == std::end(RightEdgeCells))) || (numericalNetMovement == 7 && (std::find(std::begin(LeftEdgeCells), std::end(LeftEdgeCells), numericalStartPos) == std::end(LeftEdgeCells))) || (numericalNetMovement == 8) || (numericalNetMovement == 9 && (std::find(std::begin(RightEdgeCells), std::end(RightEdgeCells), numericalStartPos) == std::end(RightEdgeCells)))))) {
+            // Tell which piece to remove
+            return board[numericalPos];
+        }
     }
     
     // No capture happened
@@ -299,7 +311,7 @@ int main()
     h1.setFillColor(sf::Color(255, 206, 158));
     h1.setPosition(1700,800);
 
-        sf::Texture B, b, K, k, N, n, P, p, Q, q, R, r;
+    sf::Texture B, b, K, k, N, n, P, p, Q, q, R, r;
 
     B.loadFromFile("../assets/pieces/B.png");
     b.loadFromFile("../assets/pieces/b.png");
@@ -385,6 +397,8 @@ int main()
     sf::Sprite* blackPieces[16] = {&a8s, &b8s, &c8s, &d8s, &e8s, &f8s, &g8s, &h8s, &a7s, &b7s, &c7s, &d7s, &e7s, &f7s, &g7s, &h7s};
     sf::Sprite* whitePieces[16] = {&a2s, &b2s, &c2s, &d2s, &e2s, &f2s, &g2s, &h2s, &a1s, &b1s, &c1s, &d1s, &e1s, &f1s, &g1s, &h1s};
     
+    sf::Sprite* pawnList[16] = {&a7s, &b7s, &c7s, &d7s, &e7s, &f7s, &g7s, &h7s, &a2s, &b2s, &c2s, &d2s, &e2s, &f2s, &g2s, &h2s};
+
     bool isPieceSelected = false;
     sf::Sprite* selectedPiece = nullptr;
     sf::Vector2f originalPosition;
@@ -605,8 +619,21 @@ int main()
                 {
                     sf::Vector2f newPosition = getClosestGridPosition(mousePosition);
                     int moveWhom = -1;
+                    uint8_t numericalPieceId;
                     
-                    moveWhom = handleCapture(selectedPiece, originalPosition, newPosition, (std::find(std::begin(blackPieces), std::end(blackPieces), selectedPiece)) == std::end(blackPieces)); // Call a function to handle capturing
+                    if ((selectedPiece == &a8s) || (selectedPiece == &h8s) || (selectedPiece == &a1s) || (selectedPiece == &h1s)) numericalPieceId = 2;
+                    if ((selectedPiece == &b8s) || (selectedPiece == &g8s) || (selectedPiece == &b1s) || (selectedPiece == &g1s)) numericalPieceId = 3;
+                    if ((selectedPiece == &c8s) || (selectedPiece == &f8s) || (selectedPiece == &c1s) || (selectedPiece == &f1s)) numericalPieceId = 4;
+                    if ((selectedPiece == &e8s) || (selectedPiece == &e1s)) numericalPieceId = 5;
+                    if ((selectedPiece == &d8s) || (selectedPiece == &d1s)) numericalPieceId = 6;
+                    if (std::find(std::begin(pawnList), std::end(pawnList), selectedPiece) != std::end(pawnList)) numericalPieceId = 1;
+                    
+                    
+                    
+                    
+                    moveWhom = handleCapture(numericalPieceId, selectedPiece, originalPosition, newPosition, (std::find(std::begin(blackPieces), std::end(blackPieces), selectedPiece)) == std::end(blackPieces));
+                        
+                        
                         if (moveWhom >= 0) {
 
                         numericalPos = ((newPosition.x - 1005) / 100) + ((newPosition.y - 105) / 100 * 8);
