@@ -13,6 +13,7 @@ uint8_t VerticalEdgePieces[16] = {0, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 4
 uint8_t LeftEdgeCells[8] = {0, 8, 16, 24, 32, 40, 48, 56};
 uint8_t RightEdgeCells[8] = {7, 15, 23, 31, 39, 47, 55, 63};
 int8_t KingLegalMoves[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
+sf::Sprite* promotedPawns[16] = {};
 bool isWhitesTurnToMove = true;
 
 bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite) {
@@ -48,7 +49,7 @@ bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite
         if (startRank == 1 && rankDiff == 2 && fileDiff == 0) {
             return true;
         }
-        if (board[newPosition] >= 16 && board[newPosition] <= 31 && rankDiff == -1 && std::abs(fileDiff) == 1) {
+        if (board[newPosition] >= 16 && board[newPosition] <= 31 && rankDiff == 1 && std::abs(fileDiff) == 1) {
             return true;
         }
     }
@@ -144,6 +145,10 @@ bool isMovingPathBlocked(uint8_t originalPosition, uint8_t newPosition) {
     return false;
 }
 
+bool isSelectedPieceInListOfPromotedPawns (sf::Sprite* piece) {
+    return std::find(std::begin(promotedPawns), std::end(promotedPawns), piece) != std::end(promotedPawns);
+}
+
 int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::Vector2f& originalPosition, const sf::Vector2f& newPosition, bool isWhite)
 {
     // Find the position in the board array of the new position
@@ -157,7 +162,8 @@ int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::V
         int8_t numericalNetMovement = numericalPos - numericalStartPos;
         
         // Determine whether the move is legal
-        if ((numericalPieceId == 1 && isPawnMoveLegal(numericalStartPos, numericalPos, isWhite)) ||
+        if ((numericalPieceId == 1 && isPawnMoveLegal(numericalStartPos, numericalPos, isWhite) && !isSelectedPieceInListOfPromotedPawns(targetPiece)) ||
+        (numericalPieceId == 1 && isQueenMoveLegal(numericalStartPos, numericalPos) && isSelectedPieceInListOfPromotedPawns(targetPiece)) ||
         (numericalPieceId == 2 && isRookMoveLegal(numericalStartPos, numericalPos)) ||
         (numericalPieceId == 3 && isKnightMoveLegal(numericalStartPos, numericalPos)) ||
         (numericalPieceId == 4 && isBishopMoveLegal(numericalStartPos, numericalPos)) ||
@@ -167,6 +173,11 @@ int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::V
                 if (isMovingPathBlocked(numericalStartPos, numericalPos)) return -1;
             }
             // Tell which piece to remove
+            if (numericalPieceId == 1) {
+                if ((newPosition.y == 105 && isWhite) || (newPosition.y == 805 && !isWhite)) {
+                    return board[numericalPos] + 32;
+                }
+            }
             return board[numericalPos];
         }
     }
@@ -478,6 +489,14 @@ int main()
     sf::Sprite f7s(p);
     sf::Sprite g7s(p);
     sf::Sprite h7s(p);
+    sf::Sprite a7sp(q);
+    sf::Sprite b7sp(q);
+    sf::Sprite c7sp(q);
+    sf::Sprite d7sp(q);
+    sf::Sprite e7sp(q);
+    sf::Sprite f7sp(q);
+    sf::Sprite g7sp(q);
+    sf::Sprite h7sp(q);
     sf::Sprite a2s(P);
     sf::Sprite b2s(P);
     sf::Sprite c2s(P);
@@ -486,6 +505,14 @@ int main()
     sf::Sprite f2s(P);
     sf::Sprite g2s(P);
     sf::Sprite h2s(P);
+    sf::Sprite a2sp(Q);
+    sf::Sprite b2sp(Q);
+    sf::Sprite c2sp(Q);
+    sf::Sprite d2sp(Q);
+    sf::Sprite e2sp(Q);
+    sf::Sprite f2sp(Q);
+    sf::Sprite g2sp(Q);
+    sf::Sprite h2sp(Q);
     sf::Sprite a1s(R);
     sf::Sprite b1s(N);
     sf::Sprite c1s(B);
@@ -511,6 +538,24 @@ int main()
     f7s.setPosition(1505, 205);
     g7s.setPosition(1605, 205);
     h7s.setPosition(1705, 205);
+
+    a7sp.setPosition(-100, -100);
+    b7sp.setPosition(-100, -100);
+    c7sp.setPosition(-100, -100);
+    d7sp.setPosition(-100, -100);
+    e7sp.setPosition(-100, -100);
+    f7sp.setPosition(-100, -100);
+    g7sp.setPosition(-100, -100);
+    h7sp.setPosition(-100, -100);
+
+    a2sp.setPosition(-100, -100);
+    b2sp.setPosition(-100, -100);
+    c2sp.setPosition(-100, -100);
+    d2sp.setPosition(-100, -100);
+    e2sp.setPosition(-100, -100);
+    f2sp.setPosition(-100, -100);
+    g2sp.setPosition(-100, -100);
+    h2sp.setPosition(-100, -100);
 
     a2s.setPosition(1005, 705);
     b2s.setPosition(1105, 705);
@@ -764,12 +809,138 @@ int main()
                     if (std::find(std::begin(pawnList), std::end(pawnList), selectedPiece) != std::end(pawnList)) numericalPieceId = 1;
                     
                     
-                    
-                    
                     moveWhom = handleCapture(numericalPieceId, selectedPiece, originalPosition, newPosition, (std::find(std::begin(blackPieces), std::end(blackPieces), selectedPiece)) == std::end(blackPieces));
-                        
-                        
-                        if (moveWhom >= 0) {
+
+                    std::cout << moveWhom << std::endl;
+
+                    if (moveWhom > 31 && moveWhom != 255) {
+                        numericalPos = ((newPosition.x - 1005) / 100) + ((newPosition.y - 105) / 100 * 8);
+                        if (selectedPiece == &a7s) {a7s.setTexture(q);promotedPawns[0]=&a7s;}
+                        if (selectedPiece == &b7s) {b7s.setTexture(q);promotedPawns[1]=&b7s;}
+                        if (selectedPiece == &c7s) {c7s.setTexture(q);promotedPawns[2]=&c7s;}
+                        if (selectedPiece == &d7s) {d7s.setTexture(q);promotedPawns[3]=&d7s;}
+                        if (selectedPiece == &e7s) {e7s.setTexture(q);promotedPawns[4]=&e7s;}
+                        if (selectedPiece == &f7s) {f7s.setTexture(q);promotedPawns[5]=&f7s;}
+                        if (selectedPiece == &g7s) {g7s.setTexture(q);promotedPawns[6]=&g7s;}
+                        if (selectedPiece == &h7s) {h7s.setTexture(q);promotedPawns[7]=&h7s;}
+                        if (selectedPiece == &a2s) {a2s.setTexture(Q);promotedPawns[8]=&a2s;}
+                        if (selectedPiece == &b2s) {b2s.setTexture(Q);promotedPawns[9]=&b2s;}
+                        if (selectedPiece == &c2s) {c2s.setTexture(Q);promotedPawns[10]=&c2s;}
+                        if (selectedPiece == &d2s) {d2s.setTexture(Q);promotedPawns[11]=&d2s;}
+                        if (selectedPiece == &e2s) {e2s.setTexture(Q);promotedPawns[12]=&e2s;}
+                        if (selectedPiece == &f2s) {f2s.setTexture(Q);promotedPawns[13]=&f2s;}
+                        if (selectedPiece == &g2s) {g2s.setTexture(Q);promotedPawns[14]=&g2s;}
+                        if (selectedPiece == &h2s) {h2s.setTexture(Q);promotedPawns[15]=&h2s;}
+
+                        switch (moveWhom) {
+                            case 32:
+                                a8s.setPosition(-100, -100);
+                                break;
+                            case 33:
+                                b8s.setPosition(-100, -100);
+                                break;
+                            case 34:
+                                c8s.setPosition(-100, -100);
+                                break;
+                            case 35:
+                                d8s.setPosition(-100, -100);
+                                break;
+                            case 36:
+                                e8s.setPosition(-100, -100);
+                                break;
+                            case 37:
+                                f8s.setPosition(-100, -100);
+                                break;
+                            case 38:
+                                g8s.setPosition(-100, -100);
+                                break;
+                            case 39:
+                                h8s.setPosition(-100, -100);
+                                break;
+                            case 40:
+                                a7s.setPosition(-100, -100);
+                                break;
+                            case 41:
+                                b7s.setPosition(-100, -100);
+                                break;
+                            case 42:
+                                c7s.setPosition(-100, -100);
+                                break;
+                            case 43:
+                                d7s.setPosition(-100, -100);
+                                break;
+                            case 44:
+                                e7s.setPosition(-100, -100);
+                                break;
+                            case 45:
+                                f7s.setPosition(-100, -100);
+                                break;
+                            case 46:
+                                g7s.setPosition(-100, -100);
+                                break;
+                            case 47:
+                                h7s.setPosition(-100, -100);
+                                break;
+                            case 48:
+                                a2s.setPosition(-100, -100);
+                                break;
+                            case 49:
+                                b2s.setPosition(-100, -100);
+                                break;
+                            case 50:
+                                c2s.setPosition(-100, -100);
+                                break;
+                            case 51:
+                                d2s.setPosition(-100, -100);
+                                break;
+                            case 52:
+                                e2s.setPosition(-100, -100);
+                                break;
+                            case 53:
+                                f2s.setPosition(-100, -100);
+                                break;
+                            case 54:
+                                g2s.setPosition(-100, -100);
+                                break;
+                            case 55:
+                                h2s.setPosition(-100, -100);
+                                break;
+                            case 56:
+                                a1s.setPosition(-100, -100);
+                                break;
+                            case 57:
+                                b1s.setPosition(-100, -100);
+                                break;
+                            case 58:
+                                c1s.setPosition(-100, -100);
+                                break;
+                            case 59:
+                               d1s.setPosition(-100, -100);
+                                break;
+                            case 60:
+                                e1s.setPosition(-100, -100);
+                                break;
+                            case 61:
+                                f1s.setPosition(-100, -100);
+                                break;
+                            case 62:
+                                g1s.setPosition(-100, -100);
+                                 break;
+                            case 63:
+                                h1s.setPosition(-100, -100);
+                                 break;
+                            case 287:
+                                break;
+                        } 
+
+                        // selectedPiece->setPosition(newPosition);
+                        isPieceSelected = false;
+                        selectedPiece = nullptr;
+                        isWhitesTurnToMove = !isWhitesTurnToMove;
+                    }
+
+
+                    if ((moveWhom >= 0 && moveWhom <= 31) || moveWhom == 255) {
 
                         numericalPos = ((newPosition.x - 1005) / 100) + ((newPosition.y - 105) / 100 * 8);
                         if (selectedPiece == &a8s) board[numericalPos] = 0;
