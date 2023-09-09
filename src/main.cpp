@@ -6,6 +6,7 @@
 #include <cmath>
 #include <algorithm>
 #include <cstdint>
+#include <system_error>
 
 std::vector<uint8_t> board = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 uint8_t numericalPos;
@@ -331,6 +332,10 @@ bool canTheyGoToThisCell(bool isWhite, uint8_t cell) {
     }
 
     if (std::find(std::begin(validMoves), std::end(validMoves), cell) == std::end(validMoves)) return false; else return true;
+}
+
+bool isKingBeingChecked(bool isWhite) {
+    return canTheyGoToThisCell(isWhite, std::distance(board.begin(), std::find(board.begin(), board.end(), isWhite ? 28 : 4)));
 }
 
 bool canCastle(bool isWhite, bool isKingside) {
@@ -837,6 +842,17 @@ int main()
     sf::Sprite* selectedPiece = nullptr;
     sf::Vector2f originalPosition;
 
+    sf::Font tm;
+    if (!tm.loadFromFile("../assets/fonts/transportmedium.ttf")) {
+        std::cout << "Error: Font File Loading Failed" << std::endl;
+    }
+
+    sf::Text whoseTurnIsItNowText;
+    whoseTurnIsItNowText.setFont(tm);
+    whoseTurnIsItNowText.setString("White's Turn");
+    whoseTurnIsItNowText.setCharacterSize(28);
+    whoseTurnIsItNowText.setPosition(1310, 955);
+    whoseTurnIsItNowText.setFillColor(sf::Color::White);
 
 
 
@@ -1478,6 +1494,9 @@ int main()
                         isWhitesTurnToMove = !isWhitesTurnToMove;
                         
                     }
+
+                    if (isWhitesTurnToMove) whoseTurnIsItNowText.setString("White's Turn"); else whoseTurnIsItNowText.setString("Black's Turn");
+
                 }
             }
         }
@@ -1589,6 +1608,9 @@ int main()
         window.draw(f1s);
         window.draw(g1s);
         window.draw(h1s);
+
+        window.draw(whoseTurnIsItNowText);
+
         window.display();
     }
 
