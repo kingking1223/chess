@@ -19,6 +19,9 @@ sf::Sprite* promotedPawns[16] = {};
 bool isWhitesTurnToMove = true;
 uint8_t whiteCastleState = 5;
 uint8_t blackCastleState = 5;
+uint8_t checker = 127;
+bool isWhiteBeingChecked = false;
+bool isBlackBeingChecked = false;
 
 bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite) {
     // Assuming white pawns move from bottom (rank 2) to top (rank 7),
@@ -235,42 +238,52 @@ bool canTheyGoToThisCell(bool isWhite, uint8_t cell) {
 
     if(isWhite) {
         for (uint8_t i = 16; i < 24; ++i) {
-            for (uint8_t k = 0; k < 64; ++k){
-                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-                if (isPawnMoveLegal(start, k, true)) {
-                    validMoves.push_back(k);
+            if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+                for (uint8_t k = 0; k < 64; ++k){
+                    uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                    if (isPawnMoveLegal(start, k, true)) {
+                        validMoves.push_back(k);
+                    }
                 }
             }
         }
         for (uint8_t i = 24; i <= 31; i+=7) {
-            for (uint8_t k = 0; k < 64; ++k) {
-                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-                if (isRookMoveLegal(start, k)) {
-                    validMoves.push_back(k);
+            if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+                for (uint8_t k = 0; k < 64; ++k) {
+                    uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                    if (isRookMoveLegal(start, k)) {
+                        validMoves.push_back(k);
+                    }
                 }
             }
         }
         for (uint8_t i = 25; i<=30; i+=5) {
-            for (uint8_t k = 0; k < 64; ++k) {
-                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-                if (isKnightMoveLegal(start, k)) {
-                    validMoves.push_back(k);
+            if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+                for (uint8_t k = 0; k < 64; ++k) {
+                    uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                    if (isKnightMoveLegal(start, k)) {
+                        validMoves.push_back(k);
+                    }
                 }
             }
         }
         for (uint8_t i = 26; i<= 29; i+= 3) {
-            for (uint8_t k = 0; k<64; ++k) {
-                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-                if (isBishopMoveLegal(start, k)) {
-                    validMoves.push_back(k);
+            if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+                for (uint8_t k = 0; k<64; ++k) {
+                    uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                    if (isBishopMoveLegal(start, k)) {
+                        validMoves.push_back(k);
+                    }
                 }
             }
         }
         uint8_t i = 27;
-        for (uint8_t k = 0; k< 64; ++k){
-            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-            if (isQueenMoveLegal(start, k)) {
-                validMoves.push_back(k);
+        if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+            for (uint8_t k = 0; k< 64; ++k){
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isQueenMoveLegal(start, k)) {
+                    validMoves.push_back(k);
+                }
             }
         }
         i = 28;
@@ -284,42 +297,52 @@ bool canTheyGoToThisCell(bool isWhite, uint8_t cell) {
     else 
     {
         for (uint8_t i = 8; i < 16; ++i) {
-            for (uint8_t k = 0; k < 64; ++k){
-                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-                if (isPawnMoveLegal(start, k, false)) {
-                    validMoves.push_back(k);
+            if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+                for (uint8_t k = 0; k < 64; ++k){
+                    uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                    if (isPawnMoveLegal(start, k, false)) {
+                        validMoves.push_back(k);
+                    }
                 }
             }
         }
         for (uint8_t i = 0; i <= 7; i+=7) {
-            for (uint8_t k = 0; k < 64; ++k) {
-                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-                if (isRookMoveLegal(start, k)) {
-                    validMoves.push_back(k);
+            if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+                for (uint8_t k = 0; k < 64; ++k) {
+                    uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                    if (isRookMoveLegal(start, k)) {
+                        validMoves.push_back(k);
+                    }
                 }
             }
         }
         for (uint8_t i = 1; i<=6; i+=5) {
-            for (uint8_t k = 0; k < 64; ++k) {
-                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-                if (isKnightMoveLegal(start, k)) {
-                    validMoves.push_back(k);
+            if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+                for (uint8_t k = 0; k < 64; ++k) {
+                    uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                    if (isKnightMoveLegal(start, k)) {
+                        validMoves.push_back(k);
+                    }
                 }
             }
         }
         for (uint8_t i = 2; i<= 5; i+= 3) {
-            for (uint8_t k = 0; k<64; ++k) {
-                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-                if (isBishopMoveLegal(start, k)) {
-                    validMoves.push_back(k);
+            if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+                for (uint8_t k = 0; k<64; ++k) {
+                    uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                    if (isBishopMoveLegal(start, k)) {
+                        validMoves.push_back(k);
+                    }
                 }
             }
         }
         uint8_t i = 3;
-        for (uint8_t k = 0; k< 64; ++k){
-            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
-            if (isQueenMoveLegal(start, k)) {
-                validMoves.push_back(k);
+        if (std::find(std::begin(board), std::end(board), i) != std::end(board)) {
+            for (uint8_t k = 0; k< 64; ++k){
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isQueenMoveLegal(start, k)) {
+                    validMoves.push_back(k);
+                }
             }
         }
         i = 4;
@@ -332,10 +355,6 @@ bool canTheyGoToThisCell(bool isWhite, uint8_t cell) {
     }
 
     if (std::find(std::begin(validMoves), std::end(validMoves), cell) == std::end(validMoves)) return false; else return true;
-}
-
-bool isKingBeingChecked(bool isWhite) {
-    return canTheyGoToThisCell(isWhite, std::distance(board.begin(), std::find(board.begin(), board.end(), isWhite ? 28 : 4)));
 }
 
 bool canCastle(bool isWhite, bool isKingside) {
@@ -375,26 +394,30 @@ bool isMovingPathBlocked(uint8_t originalPosition, uint8_t newPosition) {
 
     // fileDiff == 0 implies a verical move
     if (fileDiff == 0) {
-        for (int i = std::max(originalPosition, newPosition); i > std::min(originalPosition, newPosition); i-=8) {
+        for (int i = std::max(originalPosition, newPosition) - 8; i > std::min(originalPosition, newPosition); i-=8) {
             if (board[i] != 255) return true;
         }
     } else if (rankDiff == 0) { // rankDiff == 0 implies a horizontal move
-        for (int i = std::max(originalPosition, newPosition); i > std::min(originalPosition, newPosition); i-=1) {
+        for (int i = std::max(originalPosition, newPosition) - 1; i > std::min(originalPosition, newPosition); i-=1) {
             if (board[i] != 255) return true;
         }
-    } else if (fileDiff * rankDiff != 0) {
+    } else if (fileDiff != 0 && rankDiff != 0) {
         if (std::abs(originalPosition - newPosition) % 7 == 0) {
-            for (int i = std::max(originalPosition, newPosition); i > std::min(originalPosition, newPosition); i-= 7) {
+            for (int i = std::max(originalPosition, newPosition) - 7; i > std::min(originalPosition, newPosition); i-= 7) {
                 if (board[i] != 255) return true;
             }
         } else {
-            for (int i = std::max(originalPosition, newPosition); i > std::min(originalPosition, newPosition); i-= 9) {
+            for (int i = std::max(originalPosition, newPosition) - 9; i > std::min(originalPosition, newPosition); i-= 9) {
                 if (board[i] != 255) return true;
             }
         }
     }
 
     return false;
+}
+
+bool isKingBeingChecked(bool isWhite) {
+    return canTheyGoToThisCell(!isWhite, std::distance(board.begin(), std::find(board.begin(), board.end(), isWhite ? 28 : 4)));
 }
 
 bool isSelectedPieceInListOfPromotedPawns (sf::Sprite* piece) {
@@ -851,8 +874,15 @@ int main()
     whoseTurnIsItNowText.setFont(tm);
     whoseTurnIsItNowText.setString("White's Turn");
     whoseTurnIsItNowText.setCharacterSize(28);
-    whoseTurnIsItNowText.setPosition(1310, 955);
+    whoseTurnIsItNowText.setPosition(1310, 935);
     whoseTurnIsItNowText.setFillColor(sf::Color::White);
+
+    sf::Text checkOrCheckmateText;
+    checkOrCheckmateText.setFont(tm);
+    checkOrCheckmateText.setString("");
+    checkOrCheckmateText.setCharacterSize(28);
+    checkOrCheckmateText.setPosition(1300, 985);
+    checkOrCheckmateText.setFillColor(sf::Color::White);
 
 
 
@@ -1168,6 +1198,7 @@ int main()
                     }
                     numericalPos = ((originalPosition.x - 1005) / 100) + ((originalPosition.y - 105) / 100 * 8);
                     board[numericalPos] = 255;
+                    
                 
                 }
                 else
@@ -1184,6 +1215,9 @@ int main()
                     if (std::find(std::begin(pawnList), std::end(pawnList), selectedPiece) != std::end(pawnList)) numericalPieceId = 1;
                     
                     moveWhom = handleCapture(numericalPieceId, selectedPiece, originalPosition, newPosition, (std::find(std::begin(blackPieces), std::end(blackPieces), selectedPiece)) == std::end(blackPieces));
+
+                    uint8_t numericalStartPos = ((originalPosition.x - 1005) / 100) + ((originalPosition.y - 105) / 100 * 8);
+                    uint8_t numericalEndPos = ((newPosition.x - 1005) / 100) + ((newPosition.y - 105) / 100 * 8);
 
                     // std::cout << unsigned(whiteCastleState) << std::endl;
                     // std::cout << unsigned(board[61]) << std::endl;
@@ -1212,7 +1246,7 @@ int main()
 
                         selectedPiece->setPosition(newPosition);
                         isPieceSelected = false;
-                        selectedPiece = nullptr;
+                        
                         isWhitesTurnToMove = !isWhitesTurnToMove;
                     }
 
@@ -1345,7 +1379,7 @@ int main()
 
                         // selectedPiece->setPosition(newPosition);
                         isPieceSelected = false;
-                        selectedPiece = nullptr;
+                        
                         isWhitesTurnToMove = !isWhitesTurnToMove;
                     }
 
@@ -1490,13 +1524,79 @@ int main()
 
                         selectedPiece->setPosition(newPosition);
                         isPieceSelected = false;
-                        selectedPiece = nullptr;
+                        
                         isWhitesTurnToMove = !isWhitesTurnToMove;
                         
                     }
 
                     if (isWhitesTurnToMove) whoseTurnIsItNowText.setString("White's Turn"); else whoseTurnIsItNowText.setString("Black's Turn");
 
+                    if (selectedPiece == &a8s) checker = 0;
+                    if (selectedPiece == &b8s) checker = 1;
+                    if (selectedPiece == &c8s) checker = 2;
+                    if (selectedPiece == &d8s) checker = 3;
+                    if (selectedPiece == &e8s) checker = 4;
+                    if (selectedPiece == &f8s) checker = 5;
+                    if (selectedPiece == &g8s) checker = 6;
+                    if (selectedPiece == &h8s) checker = 7;
+                    if (selectedPiece == &a7s) checker = 8;
+                    if (selectedPiece == &b7s) checker = 9;
+                    if (selectedPiece == &c7s) checker = 10;
+                    if (selectedPiece == &d7s) checker = 11;
+                    if (selectedPiece == &e7s) checker = 12;
+                    if (selectedPiece == &f7s) checker = 13;
+                    if (selectedPiece == &g7s) checker = 14;
+                    if (selectedPiece == &h7s) checker = 15;
+                    if (selectedPiece == &a2s) checker = 16;
+                    if (selectedPiece == &b2s) checker = 17;
+                    if (selectedPiece == &c2s) checker = 18;
+                    if (selectedPiece == &d2s) checker = 19;
+                    if (selectedPiece == &e2s) checker = 20;
+                    if (selectedPiece == &f2s) checker = 21;
+                    if (selectedPiece == &g2s) checker = 22;
+                    if (selectedPiece == &h2s) checker = 23;
+                    if (selectedPiece == &a1s) checker = 24;
+                    if (selectedPiece == &b1s) checker = 25;
+                    if (selectedPiece == &c1s) checker = 26;
+                    if (selectedPiece == &d1s) checker = 27;
+                    if (selectedPiece == &e1s) checker = 28;
+                    if (selectedPiece == &f1s) checker = 29;
+                    if (selectedPiece == &g1s) checker = 30;
+                    if (selectedPiece == &h1s) checker = 31;
+
+                    if (isKingBeingChecked(true)){
+                        if (checker != 1 && checker != 6) {
+                            if (!(isMovingPathBlocked(std::distance(std::begin(board), std::find(std::begin(board), std::end(board), checker)), std::distance(std::begin(board), std::find(std::begin(board), std::end(board), 28))))) {
+                                checkOrCheckmateText.setString("White is Being Checked");
+                                isWhiteBeingChecked = true;
+                            }
+                            else {
+                                isWhiteBeingChecked = false;
+                                checkOrCheckmateText.setString("");
+                            }
+                        }
+                        else {
+                            isWhiteBeingChecked = true;
+                        }
+                    }
+
+                    if (isKingBeingChecked(false)){
+                        if (checker != 25 && checker != 30) {
+                            if (!(isMovingPathBlocked(std::distance(std::begin(board), std::find(std::begin(board), std::end(board), checker)), std::distance(std::begin(board), std::find(std::begin(board), std::end(board), 4))))) {
+                                checkOrCheckmateText.setString("Black is Being Checked");
+                                isBlackBeingChecked = true;
+                            }
+                            else {
+                                isBlackBeingChecked = false;
+                                checkOrCheckmateText.setString("");
+                            }
+                        }
+                        else {
+                            isBlackBeingChecked = true;
+                        }
+                    }
+
+                    if (moveWhom != -1) selectedPiece = nullptr;
                 }
             }
         }
@@ -1610,6 +1710,7 @@ int main()
         window.draw(h1s);
 
         window.draw(whoseTurnIsItNowText);
+        window.draw(checkOrCheckmateText);
 
         window.display();
     }
