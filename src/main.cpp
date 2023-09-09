@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <cstdint>
 #include <system_error>
+#include <chrono>
+#include <thread>
+
 
 std::vector<uint8_t> board = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 uint8_t numericalPos;
@@ -22,6 +25,17 @@ uint8_t blackCastleState = 5;
 uint8_t checker = 127;
 bool isWhiteBeingChecked = false;
 bool isBlackBeingChecked = false;
+uint8_t blackTimerMin = 10;
+uint8_t blackTimerSec = 0;
+std::string blackTimerSecLS = "00";
+uint8_t blackTimerCentisec = 0;
+std::string blackTimerCentisecLS = "00";
+uint8_t whiteTimerMin = 10;
+uint8_t whiteTimerSec = 0;
+std::string whiteTimerSecLS = "00";
+uint8_t whiteTimerCentisec = 0;
+std::string whiteTimerCentisecLS = "00";
+bool gameHasStarted = false;
 
 struct computerMove {
     uint8_t numericalStartPos;
@@ -491,6 +505,10 @@ int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::V
     return -1;
 }
 
+// computerMove generateComputerMove(bool isWhite) {
+    
+// }
+
 sf::Vector2f getClosestGridPosition(const sf::Vector2f& position)
 {
     int xIndex = static_cast<int>((position.x - 1000) / 100);
@@ -501,6 +519,81 @@ sf::Vector2f getClosestGridPosition(const sf::Vector2f& position)
 
     return sf::Vector2f(newX, newY);
 }
+
+std::string toString(uint8_t *str){
+    return std::string((char *)str);
+}
+
+void whiteCountdown() {
+    bool stop = false;
+    while (!stop) {
+        if (isWhitesTurnToMove) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+            if (whiteTimerCentisec == 0) {
+                whiteTimerCentisec = 99;
+                if (whiteTimerSec == 0) {
+                    whiteTimerSec = 59;
+                    if (whiteTimerMin == 0) {
+                        // Timer reached zero, you can take appropriate action here
+                        stop = true; // Stop the timer
+                    } else {
+                        whiteTimerMin--;
+                    }
+                } else {
+                    whiteTimerSec--;
+                }
+            } else {
+                whiteTimerCentisec--;
+            }
+            
+        } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+            if (blackTimerCentisec == 0) {
+                blackTimerCentisec = 99;
+                if (blackTimerSec == 0) {
+                    blackTimerSec = 59;
+                    if (blackTimerMin == 0) {
+                        // Timer reached zero, you can take appropriate action here
+                        stop = true; // Stop the timer
+                    } else {
+                        blackTimerMin--;
+                    }
+                } else {
+                    blackTimerSec--;
+                }
+            } else {
+                blackTimerCentisec--;
+            }
+        }
+    }
+}
+
+// void blackCountdown() {
+//     bool stop = false;
+//     while (!stop) {
+//         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+//         if (blackTimerCentisec == 0) {
+//             blackTimerCentisec = 99;
+//             if (blackTimerSec == 0) {
+//                 blackTimerSec = 59;
+//                 if (blackTimerMin == 0) {
+//                     // Timer reached zero, you can take appropriate action here
+//                     stop = true; // Stop the timer
+//                 } else {
+//                     blackTimerMin--;
+//                 }
+//             } else {
+//                 blackTimerSec--;
+//             }
+//         } else {
+//             blackTimerCentisec--;
+//         }
+        
+//     }
+// }
 
 int main()
 {
@@ -890,15 +983,35 @@ int main()
     checkOrCheckmateText.setPosition(1300, 985);
     checkOrCheckmateText.setFillColor(sf::Color::White);
 
+    sf::Text blackTimer;
+    blackTimer.setFont(tm);
+    blackTimer.setString("10:00.00");
+    blackTimer.setCharacterSize(50);
+    blackTimer.setPosition(750, 280);
+    blackTimer.setFillColor(sf::Color::White);
+    blackTimer.setStyle(sf::Text::Underlined);
 
+    sf::Text whiteTimer;
+    whiteTimer.setFont(tm);
+    whiteTimer.setString("10:00.00");
+    whiteTimer.setCharacterSize(50);
+    whiteTimer.setPosition(750, 680);
+    whiteTimer.setFillColor(sf::Color::White);
+    whiteTimer.setStyle(sf::Text::Underlined);
+
+
+    std::thread whiteTimerThread(whiteCountdown);
+    // std::thread blackTimerThread(blackCountdown);
 
     while (window.isOpen())
     {
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
+                whiteTimerThread.detach();
                 window.close();
+            }
             // else if (event.type == sf::Event::Resized) {
             //     // resize view
             //     view.setSize({
@@ -1333,6 +1446,8 @@ int main()
                     if (numericalPos == 61) f1.setFillColor(sf::Color(197, 158, 94));
                     if (numericalPos == 62) g1.setFillColor(sf::Color(207, 172, 106));
                     if (numericalPos == 63) h1.setFillColor(sf::Color(197, 158, 94));
+
+                    if (!gameHasStarted) gameHasStarted = true;
                     
                 }
                 else
@@ -1811,6 +1926,18 @@ int main()
                                     mousePosition.y - 45);
             window.draw(*selectedPiece);
         }
+
+        if (gameHasStarted) {
+            if (isWhitesTurnToMove) {
+                if (whiteTimerCentisec < 10) {whiteTimerCentisecLS = "0" + std::to_string(whiteTimerCentisec);} else whiteTimerCentisecLS = std::to_string(whiteTimerCentisec);
+                if (whiteTimerSec < 10) {whiteTimerSecLS = "0" + std::to_string(whiteTimerSec);} else whiteTimerSecLS = std::to_string(whiteTimerSec);
+                whiteTimer.setString("0" + std::to_string(whiteTimerMin) + ":" + whiteTimerSecLS + "." + whiteTimerCentisecLS);
+            } else {
+                if (blackTimerCentisec < 10) {blackTimerCentisecLS = "0" + std::to_string(blackTimerCentisec);} else blackTimerCentisecLS = std::to_string(blackTimerCentisec);
+                if (blackTimerSec < 10) {blackTimerSecLS = "0" + std::to_string(blackTimerSec);} else blackTimerSecLS = std::to_string(blackTimerSec);
+                blackTimer.setString("0" + std::to_string(blackTimerMin) + ":" + blackTimerSecLS + "." + blackTimerCentisecLS);
+            }
+        }
         
         window.draw(a1);
         window.draw(a2);
@@ -1912,6 +2039,8 @@ int main()
 
         window.draw(whoseTurnIsItNowText);
         window.draw(checkOrCheckmateText);
+        window.draw(blackTimer);
+        window.draw(whiteTimer);
 
         window.display();
     }
