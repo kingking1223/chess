@@ -23,6 +23,12 @@ uint8_t checker = 127;
 bool isWhiteBeingChecked = false;
 bool isBlackBeingChecked = false;
 
+struct computerMove {
+    uint8_t numericalStartPos;
+    uint8_t numericalEndPos;
+    uint8_t numericalPieceId;
+};
+
 bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite) {
     // Assuming white pawns move from bottom (rank 2) to top (rank 7),
     // and black pawns move from top (rank 7) to bottom (rank 2).
@@ -1198,8 +1204,136 @@ int main()
                     }
                     numericalPos = ((originalPosition.x - 1005) / 100) + ((originalPosition.y - 105) / 100 * 8);
                     board[numericalPos] = 255;
+                    a8.setFillColor(sf::Color(255, 206, 158));
+                    b8.setFillColor(sf::Color(209, 137, 71));
+                    c8.setFillColor(sf::Color(255, 206, 158));
+                    d8.setFillColor(sf::Color(209, 137, 71));
+                    e8.setFillColor(sf::Color(255, 206, 158));
+                    f8.setFillColor(sf::Color(209, 137, 71));
+                    g8.setFillColor(sf::Color(255, 206, 158));
+                    h8.setFillColor(sf::Color(209, 137, 71));
+                    a7.setFillColor(sf::Color(209, 137, 71));
+                    b7.setFillColor(sf::Color(255, 206, 158));
+                    c7.setFillColor(sf::Color(209, 137, 71));
+                    d7.setFillColor(sf::Color(255, 206, 158));
+                    e7.setFillColor(sf::Color(209, 137, 71));
+                    f7.setFillColor(sf::Color(255, 206, 158));
+                    g7.setFillColor(sf::Color(209, 137, 71));
+                    h7.setFillColor(sf::Color(255, 206, 158));
+                    a6.setFillColor(sf::Color(255, 206, 158));
+                    b6.setFillColor(sf::Color(209, 137, 71));
+                    c6.setFillColor(sf::Color(255, 206, 158));
+                    d6.setFillColor(sf::Color(209, 137, 71));
+                    e6.setFillColor(sf::Color(255, 206, 158));
+                    f6.setFillColor(sf::Color(209, 137, 71));
+                    g6.setFillColor(sf::Color(255, 206, 158));
+                    h6.setFillColor(sf::Color(209, 137, 71));
+                    a5.setFillColor(sf::Color(209, 137, 71));
+                    b5.setFillColor(sf::Color(255, 206, 158));
+                    c5.setFillColor(sf::Color(209, 137, 71));
+                    d5.setFillColor(sf::Color(255, 206, 158));
+                    e5.setFillColor(sf::Color(209, 137, 71));
+                    f5.setFillColor(sf::Color(255, 206, 158));
+                    g5.setFillColor(sf::Color(209, 137, 71));
+                    h5.setFillColor(sf::Color(255, 206, 158));
+                    a4.setFillColor(sf::Color(255, 206, 158));
+                    b4.setFillColor(sf::Color(209, 137, 71));
+                    c4.setFillColor(sf::Color(255, 206, 158));
+                    d4.setFillColor(sf::Color(209, 137, 71));
+                    e4.setFillColor(sf::Color(255, 206, 158));
+                    f4.setFillColor(sf::Color(209, 137, 71));
+                    g4.setFillColor(sf::Color(255, 206, 158));
+                    h4.setFillColor(sf::Color(209, 137, 71));
+                    a3.setFillColor(sf::Color(209, 137, 71));
+                    b3.setFillColor(sf::Color(255, 206, 158));
+                    c3.setFillColor(sf::Color(209, 137, 71));
+                    d3.setFillColor(sf::Color(255, 206, 158));
+                    e3.setFillColor(sf::Color(209, 137, 71));
+                    f3.setFillColor(sf::Color(255, 206, 158));
+                    g3.setFillColor(sf::Color(209, 137, 71));
+                    h3.setFillColor(sf::Color(255, 206, 158));
+                    a2.setFillColor(sf::Color(255, 206, 158));
+                    b2.setFillColor(sf::Color(209, 137, 71));
+                    c2.setFillColor(sf::Color(255, 206, 158));
+                    d2.setFillColor(sf::Color(209, 137, 71));
+                    e2.setFillColor(sf::Color(255, 206, 158));
+                    f2.setFillColor(sf::Color(209, 137, 71));
+                    g2.setFillColor(sf::Color(255, 206, 158));
+                    h2.setFillColor(sf::Color(209, 137, 71));
+                    a1.setFillColor(sf::Color(209, 137, 71));
+                    b1.setFillColor(sf::Color(255, 206, 158));
+                    c1.setFillColor(sf::Color(209, 137, 71));
+                    d1.setFillColor(sf::Color(255, 206, 158));
+                    e1.setFillColor(sf::Color(209, 137, 71));
+                    f1.setFillColor(sf::Color(255, 206, 158));
+                    g1.setFillColor(sf::Color(209, 137, 71));
+                    h1.setFillColor(sf::Color(255, 206, 158));
+
+                    if (numericalPos == 0) a8.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 1) b8.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 2) c8.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 3) d8.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 4) e8.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 5) f8.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 6) g8.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 7) h8.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 8) a7.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 9) b7.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 10) c7.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 11) d7.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 12) e7.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 13) f7.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 14) g7.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 15) h7.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 16) a6.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 17) b6.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 18) c6.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 19) d6.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 20) e6.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 21) f6.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 22) g6.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 23) h6.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 24) a5.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 25) b5.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 26) c5.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 27) d5.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 28) e5.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 29) f5.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 30) g5.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 31) h5.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 32) a4.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 33) b4.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 34) c4.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 35) d4.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 36) e4.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 37) f4.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 38) g4.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 39) h4.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 40) a3.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 41) b3.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 42) c3.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 43) d3.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 44) e3.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 45) f3.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 46) g3.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 47) h3.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 48) a2.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 49) b2.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 50) c2.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 51) d2.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 52) e2.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 53) f2.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 54) g2.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 55) h2.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 56) a1.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 57) b1.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 58) c1.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 59) d1.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 60) e1.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 61) f1.setFillColor(sf::Color(197, 158, 94));
+                    if (numericalPos == 62) g1.setFillColor(sf::Color(207, 172, 106));
+                    if (numericalPos == 63) h1.setFillColor(sf::Color(197, 158, 94));
                     
-                
                 }
                 else
                 {
@@ -1596,7 +1730,74 @@ int main()
                         }
                     }
 
-                    if (moveWhom != -1) selectedPiece = nullptr;
+                    if (moveWhom != -1) {
+                        selectedPiece = nullptr;
+
+                        if (numericalEndPos == 0) a8.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 1) b8.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 2) c8.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 3) d8.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 4) e8.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 5) f8.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 6) g8.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 7) h8.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 8) a7.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 9) b7.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 10) c7.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 11) d7.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 12) e7.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 13) f7.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 14) g7.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 15) h7.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 16) a6.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 17) b6.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 18) c6.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 19) d6.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 20) e6.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 21) f6.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 22) g6.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 23) h6.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 24) a5.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 25) b5.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 26) c5.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 27) d5.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 28) e5.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 29) f5.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 30) g5.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 31) h5.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 32) a4.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 33) b4.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 34) c4.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 35) d4.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 36) e4.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 37) f4.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 38) g4.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 39) h4.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 40) a3.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 41) b3.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 42) c3.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 43) d3.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 44) e3.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 45) f3.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 46) g3.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 47) h3.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 48) a2.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 49) b2.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 50) c2.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 51) d2.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 52) e2.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 53) f2.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 54) g2.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 55) h2.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 56) a1.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 57) b1.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 58) c1.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 59) d1.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 60) e1.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 61) f1.setFillColor(sf::Color(197, 173, 96));
+                        if (numericalEndPos == 62) g1.setFillColor(sf::Color(221, 208, 124));
+                        if (numericalEndPos == 63) h1.setFillColor(sf::Color(197, 173, 96));
+                    }
                 }
             }
         }
