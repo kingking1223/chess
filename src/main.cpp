@@ -5,8 +5,9 @@
 #include <array>
 #include <cmath>
 #include <algorithm>
+#include <cstdint>
 
-uint8_t board[64] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+std::vector<uint8_t> board = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 uint8_t numericalPos;
 int8_t KnightLegalMoves[8] = {-17, -15, -6, 10, 17, 15, 6, -10};
 uint8_t VerticalEdgePieces[16] = {0, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 48, 55, 56, 63};
@@ -15,7 +16,8 @@ uint8_t RightEdgeCells[8] = {7, 15, 23, 31, 39, 47, 55, 63};
 int8_t KingLegalMoves[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
 sf::Sprite* promotedPawns[16] = {};
 bool isWhitesTurnToMove = true;
-uint8_t CastleState = 136;
+uint8_t whiteCastleState = 5;
+uint8_t blackCastleState = 5;
 
 bool isPawnMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite) {
     // Assuming white pawns move from bottom (rank 2) to top (rank 7),
@@ -105,18 +107,256 @@ bool isQueenMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
     return (isRookMoveLegal(originalPosition, newPosition) || isBishopMoveLegal(originalPosition, newPosition));
 }
 
-bool isKingMoveLegal(uint8_t originalPosition, uint8_t newPosition) {
+bool isKingMoveLegal(uint8_t originalPosition, uint8_t newPosition, bool isWhite) {
     if (originalPosition == newPosition) return false;
     int startRank = std::floor(originalPosition / 8); 
     int endRank = std::floor(newPosition / 8); 
     int startFile = originalPosition % 8; 
     int endFile = newPosition % 8; 
 
-    int rankDiff = std::abs(endRank - startRank);  
-    int fileDiff = std::abs(endFile - startFile);
+    int rankDiff = endRank - startRank;  
+    int fileDiff = endFile - startFile;
+
+    if (std::abs(fileDiff) == 2 && rankDiff == 0) return true;
 
     // Kings can move one square in any direction.
-    return (rankDiff <= 1 && fileDiff <= 1);
+    return (std::abs(rankDiff) <= 1 && std::abs(fileDiff) <= 1);
+}
+
+std::vector<std::string> canTheyGoToThisCell2(bool isWhite, uint8_t cell) {
+    std::vector<std::string> validMoves;
+
+    if(isWhite) {
+        for (uint8_t i = 16; i < 24; ++i) {
+            for (uint8_t k = 0; k < 64; ++k){
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isPawnMoveLegal(start, k, true)) {
+                    validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+                }
+            }
+        }
+        for (uint8_t i = 24; i <= 31; i+=7) {
+            for (uint8_t k = 0; k < 64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isRookMoveLegal(start, k)) {
+                    validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+                }
+            }
+        }
+        for (uint8_t i = 25; i<=30; i+=5) {
+            for (uint8_t k = 0; k < 64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isKnightMoveLegal(start, k)) {
+                    validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+                }
+            }
+        }
+        for (uint8_t i = 26; i<= 29; i+= 3) {
+            for (uint8_t k = 0; k<64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isBishopMoveLegal(start, k)) {
+                    validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+                }
+            }
+        }
+        uint8_t i = 27;
+        for (uint8_t k = 0; k< 64; ++k){
+            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+            if (isQueenMoveLegal(start, k)) {
+                validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+            }
+        }
+        i = 28;
+        for (uint8_t k = 0; k< 64; ++k){
+            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+            if (isKingMoveLegal(start, k, true)) {
+                validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+            }
+        }
+    } 
+    else 
+    {
+        for (uint8_t i = 8; i < 16; ++i) {
+            for (uint8_t k = 0; k < 64; ++k){
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isPawnMoveLegal(start, k, false)) {
+                    validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+                }
+            }
+        }
+        for (uint8_t i = 0; i <= 7; i+=7) {
+            for (uint8_t k = 0; k < 64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isRookMoveLegal(start, k)) {
+                    validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+                }
+            }
+        }
+        for (uint8_t i = 1; i<=6; i+=5) {
+            for (uint8_t k = 0; k < 64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isKnightMoveLegal(start, k)) {
+                    validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+                }
+            }
+        }
+        for (uint8_t i = 2; i<= 5; i+= 3) {
+            for (uint8_t k = 0; k<64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isBishopMoveLegal(start, k)) {
+                    validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+                }
+            }
+        }
+        uint8_t i = 11;
+        for (uint8_t k = 0; k< 64; ++k){
+            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), 3));
+            if (isQueenMoveLegal(start, k)) {
+                validMoves.push_back(std::to_string(start) + "-" + std::to_string(k));
+            }
+        }
+        i = 12;
+        for (uint8_t k = 0; k< 64; ++k){
+            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), 4));
+            if (isKingMoveLegal(start, k, false)) {
+                validMoves.push_back(std::to_string(start) + "-" + std::to_string(k) + "k");
+            }
+        }
+    }
+
+    return validMoves;
+
+    // if (std::find(std::begin(validMoves), std::end(validMoves), cell) == std::end(validMoves)) return false; else return true;
+}
+
+bool canTheyGoToThisCell(bool isWhite, uint8_t cell) {
+    std::vector<uint8_t> validMoves;
+
+    if(isWhite) {
+        for (uint8_t i = 16; i < 24; ++i) {
+            for (uint8_t k = 0; k < 64; ++k){
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isPawnMoveLegal(start, k, true)) {
+                    validMoves.push_back(k);
+                }
+            }
+        }
+        for (uint8_t i = 24; i <= 31; i+=7) {
+            for (uint8_t k = 0; k < 64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isRookMoveLegal(start, k)) {
+                    validMoves.push_back(k);
+                }
+            }
+        }
+        for (uint8_t i = 25; i<=30; i+=5) {
+            for (uint8_t k = 0; k < 64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isKnightMoveLegal(start, k)) {
+                    validMoves.push_back(k);
+                }
+            }
+        }
+        for (uint8_t i = 26; i<= 29; i+= 3) {
+            for (uint8_t k = 0; k<64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isBishopMoveLegal(start, k)) {
+                    validMoves.push_back(k);
+                }
+            }
+        }
+        uint8_t i = 27;
+        for (uint8_t k = 0; k< 64; ++k){
+            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+            if (isQueenMoveLegal(start, k)) {
+                validMoves.push_back(k);
+            }
+        }
+        i = 28;
+        for (uint8_t k = 0; k< 64; ++k){
+            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+            if (isKingMoveLegal(start, k, true)) {
+                validMoves.push_back(k);
+            }
+        }
+    } 
+    else 
+    {
+        for (uint8_t i = 8; i < 16; ++i) {
+            for (uint8_t k = 0; k < 64; ++k){
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isPawnMoveLegal(start, k, false)) {
+                    validMoves.push_back(k);
+                }
+            }
+        }
+        for (uint8_t i = 0; i <= 7; i+=7) {
+            for (uint8_t k = 0; k < 64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isRookMoveLegal(start, k)) {
+                    validMoves.push_back(k);
+                }
+            }
+        }
+        for (uint8_t i = 1; i<=6; i+=5) {
+            for (uint8_t k = 0; k < 64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isKnightMoveLegal(start, k)) {
+                    validMoves.push_back(k);
+                }
+            }
+        }
+        for (uint8_t i = 2; i<= 5; i+= 3) {
+            for (uint8_t k = 0; k<64; ++k) {
+                uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+                if (isBishopMoveLegal(start, k)) {
+                    validMoves.push_back(k);
+                }
+            }
+        }
+        uint8_t i = 3;
+        for (uint8_t k = 0; k< 64; ++k){
+            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+            if (isQueenMoveLegal(start, k)) {
+                validMoves.push_back(k);
+            }
+        }
+        i = 4;
+        for (uint8_t k = 0; k< 64; ++k){
+            uint8_t start = std::distance(board.begin(), std::find(board.begin(), board.end(), i));
+            if (isKingMoveLegal(start, k, false)) {
+                validMoves.push_back(k);
+            }
+        }
+    }
+
+    if (std::find(std::begin(validMoves), std::end(validMoves), cell) == std::end(validMoves)) return false; else return true;
+}
+
+bool canCastle(bool isWhite, bool isKingside) {
+    if (isWhite){
+        if (isKingside) {
+            if (whiteCastleState != 0 && board[61] == 255 && board[62] == 255 && !(canTheyGoToThisCell(false, 61)) && !(canTheyGoToThisCell(false, 62))) {
+                return true;
+            }
+        } else {
+            if (whiteCastleState != 0 && board[57] == 255 && board[58] == 255 && board[59] == 255 && !(canTheyGoToThisCell(false, 57)) && !(canTheyGoToThisCell(false, 58)) & !(canTheyGoToThisCell(false, 59))) {
+                return true;
+            }
+        }
+    } else {
+        if (isKingside) {
+            if (blackCastleState != 0 && board[5] == 255 && board[6] == 255 && !(canTheyGoToThisCell(true, 5)) && !(canTheyGoToThisCell(true, 6))) {
+                return true;
+            }
+        } else {
+            if (blackCastleState != 0 && board[1] == 255 && board[2] == 255 && board[3] == 255 && !(canTheyGoToThisCell(true, 1)) && !(canTheyGoToThisCell(true, 2)) && !(canTheyGoToThisCell(true, 3))) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 bool isMovingPathBlocked(uint8_t originalPosition, uint8_t newPosition) {
@@ -175,8 +415,8 @@ int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::V
         (numericalPieceId == 3 && isKnightMoveLegal(numericalStartPos, numericalPos)) ||
         (numericalPieceId == 4 && isBishopMoveLegal(numericalStartPos, numericalPos)) ||
         (numericalPieceId == 5 && isQueenMoveLegal(numericalStartPos, numericalPos)) ||
-        (numericalPieceId == 6 && isKingMoveLegal(numericalStartPos, numericalPos))) {
-            if (numericalPieceId != 2) {
+        (numericalPieceId == 6 && isKingMoveLegal(numericalStartPos, numericalPos, isWhite))) {
+            if (numericalPieceId != 3) {
                 if (isMovingPathBlocked(numericalStartPos, numericalPos)) return -1;
             }
             // Tell which piece to remove
@@ -188,6 +428,27 @@ int handleCapture(uint8_t numericalPieceId, sf::Sprite* targetPiece, const sf::V
                     return board[numericalPos + 8];
                 }
             }
+
+            if (numericalPieceId == 6) {
+                if (numericalNetMovement == 2) {
+                    if (isWhite && canCastle(true, true)) {
+                        return 200;
+                    } else if (!isWhite && canCastle(false, true)) {
+                        return 201;
+                    }
+                    return -1;
+                }
+                if (numericalNetMovement == -2) {
+                    if (isWhite && canCastle(true, false)) {
+                        return 202;
+                    } else if (!isWhite && canCastle(false, false)) {
+                        return 203;
+                    }
+                    return -1;
+                }
+                return board[numericalPos];
+            }
+
             return board[numericalPos];
         }
     }
@@ -210,6 +471,7 @@ sf::Vector2f getClosestGridPosition(const sf::Vector2f& position)
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Chess & Algorithms");
+    sf::View view = window.getDefaultView();
     
     sf::RectangleShape a8(sf::Vector2f(100, 100));
     a8.setFillColor(sf::Color(255, 206, 158));
@@ -549,24 +811,6 @@ int main()
     g7s.setPosition(1605, 205);
     h7s.setPosition(1705, 205);
 
-    a7sp.setPosition(-100, -100);
-    b7sp.setPosition(-100, -100);
-    c7sp.setPosition(-100, -100);
-    d7sp.setPosition(-100, -100);
-    e7sp.setPosition(-100, -100);
-    f7sp.setPosition(-100, -100);
-    g7sp.setPosition(-100, -100);
-    h7sp.setPosition(-100, -100);
-
-    a2sp.setPosition(-100, -100);
-    b2sp.setPosition(-100, -100);
-    c2sp.setPosition(-100, -100);
-    d2sp.setPosition(-100, -100);
-    e2sp.setPosition(-100, -100);
-    f2sp.setPosition(-100, -100);
-    g2sp.setPosition(-100, -100);
-    h2sp.setPosition(-100, -100);
-
     a2s.setPosition(1005, 705);
     b2s.setPosition(1105, 705);
     c2s.setPosition(1205, 705);
@@ -603,6 +847,111 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            // else if (event.type == sf::Event::Resized) {
+            //     // resize view
+            //     view.setSize({
+            //         static_cast<float>(event.size.width),
+            //         static_cast<float>(event.size.height)
+            //     });
+            //     window.setView(view);
+            //     // and align shape
+            //     a8.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b8.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c8.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d8.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e8.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f8.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g8.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h8.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a7.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b7.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c7.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d7.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e7.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f7.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g7.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h7.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a6.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b6.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c6.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d6.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e6.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f6.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g6.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h6.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a5.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b5.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c5.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d5.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e5.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f5.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g5.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h5.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a4.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b4.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c4.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d4.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e4.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f4.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g4.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h4.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a3.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b3.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c3.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d3.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e3.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f3.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g3.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h3.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a2.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b2.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c2.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d2.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e2.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f2.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g2.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h2.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a1.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b1.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c1.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d1.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e1.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f1.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g1.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h1.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a8s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b8s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c8s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d8s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e8s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f8s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g8s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h8s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a7s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b7s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c7s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d7s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e7s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f7s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g7s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h7s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a2s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b2s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c2s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d2s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e2s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f2s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g2s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h2s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     a1s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     b1s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     c1s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     d1s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     e1s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     f1s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     g1s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            //     h1s.setPosition(window.mapPixelToCoords(sf::Vector2i{window.getSize() / 2u}));
+            // }
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
             {
                 sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -818,12 +1167,47 @@ int main()
                     if ((selectedPiece == &e8s) || (selectedPiece == &e1s)) numericalPieceId = 6;
                     if (std::find(std::begin(pawnList), std::end(pawnList), selectedPiece) != std::end(pawnList)) numericalPieceId = 1;
                     
-                    
                     moveWhom = handleCapture(numericalPieceId, selectedPiece, originalPosition, newPosition, (std::find(std::begin(blackPieces), std::end(blackPieces), selectedPiece)) == std::end(blackPieces));
 
-                    std::cout << moveWhom << std::endl;
+                    // std::cout << unsigned(whiteCastleState) << std::endl;
+                    // std::cout << unsigned(board[61]) << std::endl;
+                    // std::cout << unsigned(board[62]) << std::endl;
+                    // std::cout << unsigned(canTheyGoToThisCell(false, 61)) << std::endl;
+                    // std::cout << unsigned(canTheyGoToThisCell(false, 62)) << std::endl;
+                    // // for (std::string i: canTheyGoToThisCell2(false, 62)) std::cout << i << ' ' << std::endl;
+                    // std::cout << canCastle(true, true) << std::endl;
+                    // std::cout << moveWhom << std::endl;
 
-                    if (moveWhom > 31 && moveWhom != 255) {
+                    if (moveWhom >= 200 && moveWhom <= 203) {
+                        switch (moveWhom) {
+                            case 200:
+                                h1s.setPosition(1505, 805);
+                                break;
+                            case 201:
+                                h8s.setPosition(1505, 105);
+                                break;
+                            case 202:
+                                a1s.setPosition(1305, 805);
+                                break;
+                            case 203:
+                                a8s.setPosition(1305, 105);
+                                break;
+                        }
+
+                        selectedPiece->setPosition(newPosition);
+                        isPieceSelected = false;
+                        selectedPiece = nullptr;
+                        isWhitesTurnToMove = !isWhitesTurnToMove;
+                    }
+
+                    if (selectedPiece == &e8s) blackCastleState = 0;
+                    if (selectedPiece == &a8s) blackCastleState &= 0x1100;
+                    if (selectedPiece == &h8s) blackCastleState &= 0x0011;
+                    if (selectedPiece == &e1s) whiteCastleState = 0;
+                    if (selectedPiece == &a1s) whiteCastleState &= 0x1100;
+                    if (selectedPiece == &h1s) whiteCastleState &= 0x0011;
+
+                    if (moveWhom > 31 && moveWhom < 200) {
                         numericalPos = ((newPosition.x - 1005) / 100) + ((newPosition.y - 105) / 100 * 8);
                         if (selectedPiece == &a7s) {a7s.setTexture(q);promotedPawns[0]=&a7s;}
                         if (selectedPiece == &b7s) {b7s.setTexture(q);promotedPawns[1]=&b7s;}
